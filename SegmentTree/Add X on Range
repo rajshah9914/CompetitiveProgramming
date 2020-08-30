@@ -1,0 +1,74 @@
+// https://codeforces.com/edu/course/2/lesson/5/1/practice/contest/279634/problem/A
+
+
+// Given l to r, add v on l to r-1 , 2nd operation is to get a[i]..
+
+#include<bits/stdc++.h>
+using namespace std;
+
+struct segtree{
+    vector<int>operations;
+    int size;
+    void init(int n)
+    {
+        size=1;
+        while(size<2*n)size*=2;
+        operations.assign(2*size,0);
+    }
+
+    void add(int l, int r,int v,int x,int lx,int rx){
+        if(lx>=r || rx<=l)
+            return;
+        if(lx>=l && rx<=r) {
+            operations[x] += v;
+            return;
+        }
+        int m=(lx+rx)/2;
+        add(l,r,v,2*x+1,lx,m);
+        add(l,r,v,2*x+2,m,rx);
+    }
+
+    void add(int l,int r,int v){
+        add(l,r,v,0,0,size);
+    }
+
+    long long get(int i,int x,int lx, int rx){
+        if(rx-lx==1){
+            return operations[x];
+        }
+        int m=(lx+rx)/2;
+        long long res=0;
+        if(i<m)
+        res=get(i,2*x+1,lx,m);
+        else
+        res=get(i,2*x+2,m,rx);
+        return res+operations[x];
+    }
+
+    long long get(int i){
+        return get(i,0,0,size);
+    }
+};
+
+int main()
+{
+    int n,q;
+    cin>>n>>q;
+    segtree st;
+    st.init(n);
+    while(q--){
+        int ch;
+        cin>>ch;
+        if(ch==1){
+            int l,r,v;
+            cin>>l>>r>>v;
+            st.add(l,r,v);
+        }
+        else
+        {
+            int i;
+            cin>>i;
+            cout<<st.get(i)<<endl;
+        }
+    }
+}
